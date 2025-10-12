@@ -1,21 +1,46 @@
-import { useEffect, useState } from 'react'
+import React, { useContext } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-function App() {
-  const [message, setMessage] = useState('Loading...')
+import { ThemeProvider, ThemeContext } from "./ThemeContext"; // import Theme provider and context
+import {AuthProvider} from "./AuthContext";
+import Header from "./Header";
+import Login from "./Login";
+import Home from "./Home";
+import Signup from "./Signup";
+import Profile from "./Profile";
+import Notes from "./Notes";
 
-  useEffect(() => {
-    fetch('http://localhost:8000/api/test/')
-      .then(res => res.json())
-      .then(data => setMessage(data.message))
-      .catch(() => setMessage('Error fetching backend'))
-  }, [])
+function ThemedApp() {
+  const { isDark } = useContext(ThemeContext);
 
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold mb-4">AI Notes App</h1>
-      <p>{message}</p>
+    <div>
+      <Router>
+        <Header />
+        <main className={`${isDark ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} min-h-screen transition-colors duration-300 p-6`}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/notes" element={<Notes />} />
+          </Routes>
+        </main>
+      </Router>
     </div>
-  )
+  );
 }
 
-export default App
+
+function App() {
+  return (
+    // Wrap the app with ThemeProvider to provide theme context globally
+    <AuthProvider>
+      <ThemeProvider>
+        <ThemedApp />
+      </ThemeProvider>
+    </AuthProvider>
+  );
+}
+
+export default App;
