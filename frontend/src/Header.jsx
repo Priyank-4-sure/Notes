@@ -1,26 +1,31 @@
 import React, { useState, useContext } from "react";
 import { ThemeContext } from "./ThemeContext.jsx";
 import { AuthContext } from "./AuthContext.jsx";
-import { Link } from "react-router-dom";
-import '../dist/output.css'; // Tailwind CSS
+import { Link ,useNavigate} from "react-router-dom";
+// import '../dist/output.css'; // Tailwind CSS import temporarily commented out to resolve compilation error
 
 export default function Header() {
   const { isDark, toggleTheme } = useContext(ThemeContext);
-  const { token, isLoggedIn } = useContext(AuthContext);
+  const { isLoggedIn } = useContext(AuthContext);
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate=useNavigate();
 
   const handleProfileClick = () => {
-    window.location.href = "/profile";
+    navigate('/profile');
   };
 
+  
+
   return (
-    <header className={'bg-yellow-200 text-gray-900 dark:bg-gray-900 dark:text-white dark shadow-lg sticky top-0 z-50 transition-colors duration-300'}>
+    // Converted: 'bg-yellow-200 text-gray-900 dark:bg-gray-900 dark:text-white'
+    <header className={`${isDark ? 'bg-gray-900 text-white' : 'bg-yellow-200 text-gray-900'} shadow-lg sticky top-0 z-50 transition-colors duration-300`}>
       <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
 
         {/* Brand / Logo */}
         <Link
           to="/"
-          className={'text-yellow-600 hover:text-yellow-700 dark:text-yellow-400 dark:hover:text-yellow-300 text-3xl font-extrabold tracking-wide transition-colors duration-300'}
+          // Converted: 'text-yellow-400 hover:text-gray-600 dark:text-gray-600 dark:hover:text-yellow-400'
+          className={`${isDark ? 'text-yellow-400 hover:text-yellow-300' : 'text-gray-800 hover:text-gray-600'} text-3xl font-extrabold tracking-wide transition-colors duration-300`}
         >
           NOTES
         </Link>
@@ -29,6 +34,7 @@ export default function Header() {
         <nav className="hidden md:flex items-center space-x-6">
           {!isLoggedIn ? (
             <>
+              {/* These links already use ternary for their background/hover states */}
               <Link
                 to="/signup"
                 className={`${isDark ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-400 hover:bg-blue-500'} px-5 py-2 rounded-lg transition-colors duration-300`}
@@ -55,14 +61,15 @@ export default function Header() {
           {/* Theme Toggle Button */}
           <button
             onClick={toggleTheme}
-          className={`${isDark ? 'text-white' : 'text-black'} ml-4 px-3 py-1 rounded-lg transition-colors duration-300`}>
+            className={`${isDark ? 'text-white' : 'text-black'} ml-4 px-3 py-1 rounded-lg transition-colors duration-300`}>
             {isDark ?
               // Night Mode (Moon SVG)
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="white"
-                className="h-6 w-6 text-gray-900 dark:text-yellow-400 transition-colors duration-300"
+                // Converted: 'text-gray-900 dark:text-yellow-400'
+                className={`h-6 w-6 ${isDark ? 'text-yellow-400' : 'text-gray-900'} transition-colors duration-300`}
               >
                 <path d="M12 22C17.5228 22 22 17.5228 22 12C22 11.5373 21.3065 11.4608 21.0672 11.8568C19.9289 13.7406 17.8615 15 15.5 15C11.9101 15 9 12.0899 9 8.5C9 6.13845 10.2594 4.07105 12.1432 2.93276C12.5392 2.69347 12.4627 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" />
               </svg>
@@ -88,7 +95,8 @@ export default function Header() {
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="white"
-                className="h-6 w-6 text-gray-900 dark:text-yellow-400 transition-colors duration-300"
+                // Converted: 'text-gray-900 dark:text-yellow-400'
+                className={`h-6 w-6 ${isDark ? 'text-yellow-400' : 'text-gray-900'} transition-colors duration-300`}
               >
                 <path d="M12 22C17.5228 22 22 17.5228 22 12C22 11.5373 21.3065 11.4608 21.0672 11.8568C19.9289 13.7406 17.8615 15 15.5 15C11.9101 15 9 12.0899 9 8.5C9 6.13845 10.2594 4.07105 12.1432 2.93276C12.5392 2.69347 12.4627 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" />
               </svg>
@@ -147,6 +155,7 @@ export default function Header() {
           <div className="flex flex-col items-center py-4 space-y-3">
             {!isLoggedIn ? (
               <>
+                {/* These links already use ternary for their background/hover states */}
                 <Link
                   to="/signup"
                   className={`${isDark ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-300 hover:bg-blue-400'} w-10/12 text-center py-2 rounded-lg transition-colors duration-300`}

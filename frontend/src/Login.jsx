@@ -4,7 +4,7 @@ import { ThemeContext } from "./ThemeContext.jsx";
 import { AuthContext } from "./AuthContext";
 
 export default function Login() {
-  const { setToken } = useContext(AuthContext);
+  const { setToken ,setIsLoggedIn} = useContext(AuthContext);
   const { isDark } = useContext(ThemeContext);
   const navigate = useNavigate();
 
@@ -35,6 +35,7 @@ export default function Login() {
         const data = await res.json();
         setToken(data.access);
         setSuccess(true);
+        setIsLoggedIn(true);
         setTimeout(() => navigate("/"), 1500);
       } else {
         const data = await res.json();

@@ -2,7 +2,7 @@ import React, { useState,useEffect,useContext } from 'react';
 import { AuthContext } from "./AuthContext.jsx";
 
 export default function Home() {
-  const {token,isLoggedIn}= useContext(AuthContext);
+  const {token,isLoggedIn,refreshAccessToken,refreshToken}= useContext(AuthContext);
   const [notes, setNotes] = useState([]);
 
   {isLoggedIn?useEffect(() => {
@@ -13,26 +13,52 @@ export default function Home() {
   // Fetch notes with JWT token
   const fetchNotes = async (jwtToken) => {
     const res = await fetch('http://127.0.0.1:8000/api/notes/', {
-      headers: { 'Authorization': `Bearer ${jwtToken}` }
+        headers: { 'Authorization': `Bearer ${jwtToken}` }
     });
-    const data = await res.json();
-    setNotes(data);
+    if (res.status === 401 && !token && !!refreshToken) { // Unauthorized, maybe access token expired
+        // Try to refresh token
+        const newToken = await refreshAccessToken();
+
+        if (!newToken) {
+            throw new Error('Session expired');
+        }
+        setToken(newToken);
+    }
+    let data;
+    try {
+        data = await res.json();
+    } catch {
+        alert("Server error, invalid JSON.");
+        setNotes([]);
+        return;
+    }
+    setNotes(Array.isArray(data) ? data : []); // Defensive against non-array results
   };
+
     
   // Create a new note
   const createNote = async () => {
     if (!token) return alert('Please login first');
     const newNote = { title: 'New Note', markdown: 'Your content here' };
-    const res = await fetch('http://127.0.0.1:8000/api/notes/', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(newNote)
-    });
-    const data = await res.json();
-    setNotes(prev => [...prev, data]);
+    try {
+        const res = await fetch('http://127.0.0.1:8000/api/notes/', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newNote)
+        });
+        if (!res.ok) {
+        const err = await res.json();
+        alert(err.detail || 'Could not create note!');
+        return;
+        }
+        const data = await res.json();
+        setNotes(prev => [...prev, data]);
+    } catch (err) {
+        alert('Network or server error: ' + err.message);
+    }
   };
 
   return (
