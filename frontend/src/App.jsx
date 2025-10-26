@@ -23,7 +23,7 @@ function ThemedApp() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/notes" element={<Notes />} />
+            <Route path="/notes/:id" element={<Notes />} />
           </Routes>
         </main>
       </Router>
