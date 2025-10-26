@@ -1,20 +1,19 @@
 import React, { createContext, useState, useEffect } from "react";
-// Create the context
+
 export const AuthContext = createContext();
 
-// Provider
 export function AuthProvider({ children }) {
-  // Load token from localStorage on first render
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [refreshToken, setRefreshToken] = useState(() => localStorage.getItem('refresh'));
   const [isLoggedIn, setIsLoggedIn] = useState(!!token);
 
-  // Whenever token changes, update state and localStorage
   useEffect(() => {
     if (!!token) {
       localStorage.setItem('token', token);
+      setIsLoggedIn(true);
     } else {
       localStorage.removeItem('token');
+      setIsLoggedIn(false);
     }
     if (!!refreshToken) {
       localStorage.setItem('refresh', refreshToken);
@@ -23,10 +22,13 @@ export function AuthProvider({ children }) {
     }
   }, [token, refreshToken]);
 
-  // Logout function
   const logout = () => {
     setToken(null);
     setRefreshToken(null);
+    setIsLoggedIn(false);
+    localStorage.removeItem('token');
+    localStorage.removeItem('refresh');
+    window.location.href = "/login";
   };
 
   const refreshAccessToken = async () => {
@@ -34,36 +36,81 @@ export function AuthProvider({ children }) {
       logout();
       return null;
     }
+    
     try {
       const res = await fetch('http://127.0.0.1:8000/api/token/refresh/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refresh: refreshToken }),
       });
+      
       if (res.ok) {
         const data = await res.json();
         setToken(data.access);
+        localStorage.setItem('token', data.access);
+        console.log('✅ Token refreshed successfully');
         return data.access;
+      } else if (res.status === 401) {
+        // Refresh token is actually invalid/expired
+        console.log('❌ Refresh token expired');
+        logout();
+        return null;
       } else {
-        logout(); // Refresh token invalid
+        // Other server errors (500, 503, etc.) - DON'T logout
+        console.error('⚠️ Server error during refresh:', res.status);
         return null;
       }
-    } catch {
-        logout();
+    } catch (err) {
+      // Network error - DON'T logout, might be temporary
+      console.error('⚠️ Network error during refresh:', err);
       return null;
     }
   };
-  // On app mount, check token validity (optional: add JWT expiry check here)
+
+  // ⭐ THE KEY FUNCTION THAT MAKES AUTO-REFRESH WORK ⭐
+  const authFetch = async (url, options = {}) => {
+    const headers = {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    };
+
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    // First attempt with current token
+    let response = await fetch(url, { ...options, headers });
+
+    // If 401 Unauthorized, try refreshing the token
+    if (response.status === 401) {
+      console.log('🔄 Access token expired, refreshing...');
+      const newToken = await refreshAccessToken();
+      
+      if (newToken) {
+        // Retry the original request with new token
+        console.log('✅ Retrying request with new token');
+        headers.Authorization = `Bearer ${newToken}`;
+        response = await fetch(url, { ...options, headers });
+      } else {
+        // Refresh failed - user already logged out by refreshAccessToken
+        throw new Error('Session expired. Please log in again.');
+      }
+    }
+
+    return response;
+  };
 
   return (
     <AuthContext.Provider value={{
       token,
       setToken,
       isLoggedIn,
+      setIsLoggedIn,
       logout,
       refreshToken,
       setRefreshToken,
       refreshAccessToken,
+      authFetch, // ⭐ MUST EXPORT THIS ⭐
     }}>
       {children}
     </AuthContext.Provider>

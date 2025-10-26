@@ -4,7 +4,7 @@ import { ThemeContext } from "./ThemeContext.jsx";
 import { AuthContext } from "./AuthContext";
 
 export default function Login() {
-  const { setToken ,setIsLoggedIn} = useContext(AuthContext);
+  const { setToken, setRefreshToken, setIsLoggedIn } = useContext(AuthContext); // ⭐ Add setRefreshToken
   const { isDark } = useContext(ThemeContext);
   const navigate = useNavigate();
 
@@ -33,9 +33,18 @@ export default function Login() {
       });
       if (res.ok) {
         const data = await res.json();
+        
+        // ⭐⭐⭐ SAVE BOTH TOKENS ⭐⭐⭐
+        console.log('Login response:', data); // Debug
         setToken(data.access);
-        setSuccess(true);
+        setRefreshToken(data.refresh); // ⭐ THIS WAS MISSING!
         setIsLoggedIn(true);
+        
+        // Verify they're saved
+        console.log('✅ Access token saved:', data.access);
+        console.log('✅ Refresh token saved:', data.refresh);
+        
+        setSuccess(true);
         setTimeout(() => navigate("/"), 1500);
       } else {
         const data = await res.json();
@@ -43,6 +52,7 @@ export default function Login() {
       }
     } catch (err) {
       setError("Could not reach backend.");
+      console.error(err);
     } finally {
       setLoading(false);
     }
