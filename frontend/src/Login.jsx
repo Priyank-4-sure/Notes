@@ -27,7 +27,7 @@ export default function Login() {
     setLoading(true);
     setSuccess(false);
     try {
-      const res = await fetch("${API_URL}/api/token/", {
+      const res = await fetch(`${API_URL}/api/token/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
