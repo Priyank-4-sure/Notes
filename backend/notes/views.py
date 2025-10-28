@@ -7,11 +7,6 @@ from rest_framework import generics, permissions
 from .models import Note
 from .serializers import NoteSerializer
 from .serializers import UserRegistrationSerializer
-from django.views.generic import TemplateView
-
-class ReactAppView(TemplateView):
-    template_name = 'index.html'
-
     
 class UserRegistrationView(APIView):
     def post(self, request):
