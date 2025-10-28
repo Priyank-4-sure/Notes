@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const AuthContext = createContext();
 
@@ -38,7 +39,7 @@ export function AuthProvider({ children }) {
     }
     
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/token/refresh/', {
+      const res = await fetch('${API_URL}/api/token/refresh/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refresh: refreshToken }),

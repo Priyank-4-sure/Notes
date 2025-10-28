@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { ThemeContext } from "./ThemeContext.jsx";
 import { AuthContext } from "./AuthContext";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Login() {
   const { setToken, setRefreshToken, setIsLoggedIn } = useContext(AuthContext); // ⭐ Add setRefreshToken
@@ -26,7 +27,7 @@ export default function Login() {
     setLoading(true);
     setSuccess(false);
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/token/", {
+      const res = await fetch("${API_URL}/api/token/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

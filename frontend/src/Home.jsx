@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from "./AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
 import { ThemeContext } from "./ThemeContext.jsx";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Home() {
   const { token, isLoggedIn, authFetch } = useContext(AuthContext);
@@ -18,7 +19,7 @@ export default function Home() {
 
   const fetchNotes = async () => {
     try {
-      const res = await authFetch('http://127.0.0.1:8000/api/notes/');
+      const res = await authFetch(`${API_URL}/api/notes/`);
       if (res.ok) {
         const data = await res.json();
         setNotes(Array.isArray(data) ? data : []);
@@ -33,7 +34,7 @@ export default function Home() {
     if (!token) return alert('Please login first');
     const newNote = { title: 'New Note', markdown: 'Your content here', pinned: false };
     try {
-      const res = await authFetch('http://127.0.0.1:8000/api/notes/', {
+      const res = await authFetch('${API_URL}/api/notes/', {
         method: 'POST',
         body: JSON.stringify(newNote),
       });
@@ -53,7 +54,7 @@ export default function Home() {
   const deleteNote = async (id) => {
     if (!window.confirm("Are you sure you want to delete this note?")) return;
     try {
-      const res = await authFetch(`http://127.0.0.1:8000/api/notes/${id}/`, {
+      const res = await authFetch(`${API_URL}/api/notes/${id}/`, {
         method: 'DELETE',
       });
       if (res.ok || res.status === 204) {
@@ -68,7 +69,7 @@ export default function Home() {
 
   const togglePin = async (id, pinned) => {
     try {
-      const res = await authFetch(`http://127.0.0.1:8000/api/notes/${id}/`, {
+      const res = await authFetch(`${API_URL}/api/notes/${id}/`, {
         method: "PATCH",
         body: JSON.stringify({ pinned: !pinned })
       });

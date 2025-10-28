@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ThemeContext } from "./ThemeContext.jsx";
 import { AuthContext } from "./AuthContext.jsx";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Notes() {
   const { isDark } = useContext(ThemeContext);
@@ -17,7 +18,7 @@ export default function Notes() {
   useEffect(() => {
     const fetchNote = async () => {
       try {
-        const res = await authFetch(`http://127.0.0.1:8000/api/notes/${id}/`);
+        const res = await authFetch(`${API_URL}api/notes/${id}/`);
         if (res.ok) {
           const data = await res.json();
           setNote({ title: data.title, markdown: data.markdown });
