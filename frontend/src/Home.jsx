@@ -34,7 +34,7 @@ export default function Home() {
     if (!token) return alert('Please login first');
     const newNote = { title: 'New Note', markdown: 'Your content here', pinned: false };
     try {
-      const res = await authFetch('${API_URL}/api/notes/', {
+      const res = await authFetch(`${API_URL}/api/notes/`, {
         method: 'POST',
         body: JSON.stringify(newNote),
       });
