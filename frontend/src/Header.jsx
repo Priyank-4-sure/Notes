@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import { ThemeContext } from "./ThemeContext.jsx";
 import { AuthContext } from "./AuthContext.jsx";
 import { Link ,useNavigate} from "react-router-dom";
-// import '../dist/output.css'; // Tailwind CSS import temporarily commented out to resolve compilation error
+
 
 export default function Header() {
   const { isDark, toggleTheme } = useContext(ThemeContext);
