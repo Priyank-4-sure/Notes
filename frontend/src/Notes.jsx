@@ -51,7 +51,7 @@ export default function Notes() {
     debounceRef.current = setTimeout(() => {
       const saveNote = async () => {
         try {
-          await authFetch(`http://127.0.0.1:8000/api/notes/${id}/`, {
+          await authFetch(`${API_URL}/api/notes/${id}/`, {
             method: "PATCH",
             body: JSON.stringify(note),
           });
