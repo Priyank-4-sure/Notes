@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  db:
+    image: ankane/pgvector:latest
+    restart: always
+    environment:
+      # This ensures the default superuser IS 'postgres'
+      - POSTGRES_USER=postgres 
+      - POSTGRES_PASSWORD=password123
+      - POSTGRES_DB=notes_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules # Prevents host modules from overriding container modules
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    command: npm run dev -- --host
+
+volumes:
+  postgres_data:

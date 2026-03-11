@@ -1,3 +1,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@layer base {
+  html, body {
+    /* Tailwind's utility for overscroll-behavior-y: none */
+    @apply overscroll-y-none; 
+    
+    /* Optional: Prevents the screen from shifting when scrollbars appear */
+    @apply antialiased; 
+  }
+}

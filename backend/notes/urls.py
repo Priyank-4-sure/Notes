@@ -15,4 +15,5 @@ urlpatterns = [
     path('notes/', NoteListCreate.as_view(), name='notes-list-create'),
     path('notes/<int:pk>/', NoteDetail.as_view(), name='note-detail'),
     path('register/', UserRegistrationView.as_view(), name='register'),
+    path("notes/search/", views.semantic_search, name="search"),
 ]
