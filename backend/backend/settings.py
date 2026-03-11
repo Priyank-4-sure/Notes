@@ -27,7 +27,10 @@ SECRET_KEY = 'django-insecure-kp969vob(iik^lb2xa^ck(vtnqtq_f(hfq@5hbe_$+yj(plhqe
 DEBUG = False
 
 ALLOWED_HOSTS= ['https://notes-9d8j.onrender.com', 'localhost', '0.0.0.0']
-
+CORS_ALLOWED_ORIGINS = [
+    "https://your-app-name.netlify.app",
+    "http://localhost:5173", # Keep this for local testing
+]
 # Application definition
 
 INSTALLED_APPS = [
