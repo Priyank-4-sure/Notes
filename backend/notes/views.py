@@ -11,7 +11,9 @@ from .serializers import UserRegistrationSerializer
 from pgvector.django import CosineDistance
 from sentence_transformers import SentenceTransformer
 from django.db.models import F
-    
+# backend/notes/views.py
+from .utils import get_embedding_model
+
 class UserRegistrationView(APIView):
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
@@ -24,20 +26,11 @@ class UserRegistrationView(APIView):
 def test_view(request):
     return Response({"message": "Backend is working!"})
 
-model = None
-def get_model():
-    global _model
-    if _model is None:
-        from sentence_transformers import SentenceTransformer
-        _model = SentenceTransformer('all-MiniLM-L6-v2')
-    return _model
-
-# backend/notes/views.py
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def semantic_search(request):
-    get_model()
+    model = get_embedding_model() # Lazy load
     query = request.GET.get('q', '').lower() # Lowercase for case-insensitive matching
     if not query:
         return Response([])

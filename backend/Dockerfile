@@ -13,9 +13,8 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# --- AI Optimization ---
-# Pre-download the model during the BUILD phase so the app starts instantly on Render
-RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('all-MiniLM-L6-v2')"
+# Change the pre-download line in your backend/Dockerfile
+RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('paraphrase-MiniLM-L3-v2')"
 
 # NOW copy the rest of your code
 COPY . .
