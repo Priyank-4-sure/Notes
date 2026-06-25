@@ -25,16 +25,19 @@ dotenv.load_dotenv(BASE_DIR / '.env')
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-kp969vob(iik^lb2xa^ck(vtnqtq_f(hfq@5hbe_$+yj(plhqe'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-kp969vob(iik^lb2xa^ck(vtnqtq_f(hfq@5hbe_$+yj(plhqe)')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+# Temporarily set to True so we can see real errors on Render
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS= ['.onrender.com', 'localhost', '0.0.0.0']
+ALLOWED_HOSTS= ['*']
 CORS_ALLOWED_ORIGINS = [
     "https://inspiring-meerkat-559824.netlify.app",
-    "http://localhost:5173", # Keep this for local testing
-]
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+] # Keep this for local testing
+
 # Application definition
 
 INSTALLED_APPS = [
