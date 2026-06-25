@@ -34,12 +34,11 @@ services:
           property: password
 
   # Frontend Vite Static Site
-  - type: web
+  - type: static
     name: notes-frontend
-    env: static
     rootDir: frontend
     buildCommand: npm install && npm run build
-    publishDir: dist
+    publishPath: dist
     plan: free
     envVars:
       - key: VITE_API_URL
