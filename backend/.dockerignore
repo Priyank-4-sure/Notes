@@ -1,0 +1,12 @@
+**/fastembed_cache
+**/fastembed_cache/**
+fastembed_cache
+fastembed_cache/**
+db.sqlite3
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.git
+.gitignore

@@ -9,7 +9,6 @@ from .models import Note
 from .serializers import NoteSerializer
 from .serializers import UserRegistrationSerializer
 from pgvector.django import CosineDistance
-from sentence_transformers import SentenceTransformer
 from django.db.models import F
 # backend/notes/views.py
 from .utils import get_embedding_model
@@ -84,6 +83,7 @@ class NoteListCreate(generics.ListCreateAPIView):
         combined_text = f"{title} {markdown}"
 
         # 2. Generate the embedding vector
+        model = get_embedding_model()
         vector = model.encode(combined_text).tolist()
 
         # 3. Save everything together
@@ -96,3 +96,19 @@ class NoteDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return Note.objects.filter(user=self.request.user)
+
+
+class UserDetailView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        notes_count = Note.objects.filter(user=user).count()
+        return Response({
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "date_joined": user.date_joined,
+            "notes_count": notes_count
+        })
+

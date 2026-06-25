@@ -12,9 +12,13 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from datetime import timedelta
 from pathlib import Path
+import dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from the .env file in the backend directory
+dotenv.load_dotenv(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
@@ -26,7 +30,7 @@ SECRET_KEY = 'django-insecure-kp969vob(iik^lb2xa^ck(vtnqtq_f(hfq@5hbe_$+yj(plhqe
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS= ['https://notes-9d8j.onrender.com', 'localhost', '0.0.0.0']
+ALLOWED_HOSTS= ['.onrender.com', 'localhost', '0.0.0.0']
 CORS_ALLOWED_ORIGINS = [
     "https://inspiring-meerkat-559824.netlify.app",
     "http://localhost:5173", # Keep this for local testing
