@@ -90,7 +90,9 @@ import urllib.parse as urlparse
 
 db_url = os.environ.get('DATABASE_URL')
 if db_url:
-    urlparse.uses_netloc.append("postgres")
+    # Render uses postgresql:// scheme; ensure both are handled
+    if db_url.startswith('postgres://'):
+        db_url = db_url.replace('postgres://', 'postgresql://', 1)
     url = urlparse.urlparse(db_url)
     DATABASES = {
         'default': {
