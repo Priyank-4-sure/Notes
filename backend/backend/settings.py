@@ -86,16 +86,33 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME', 'notes_db'),
-        'USER': os.environ.get('DB_USER', 'postgres'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'password123'),
-        'HOST': os.environ.get('DB_HOST', 'db'), # 'db' refers to the docker service name
-        'PORT': os.environ.get('DB_PORT', '5432'),
+import urllib.parse as urlparse
+
+db_url = os.environ.get('DATABASE_URL')
+if db_url:
+    urlparse.uses_netloc.append("postgres")
+    url = urlparse.urlparse(db_url)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': url.path[1:],
+            'USER': url.username,
+            'PASSWORD': url.password,
+            'HOST': url.hostname,
+            'PORT': str(url.port) if url.port else '5432',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('DB_NAME', 'notes_db'),
+            'USER': os.environ.get('DB_USER', 'postgres'),
+            'PASSWORD': os.environ.get('DB_PASSWORD', 'password123'),
+            'HOST': os.environ.get('DB_HOST', 'db'), # 'db' refers to the docker service name
+            'PORT': os.environ.get('DB_PORT', '5432'),
+        }
+    }
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
