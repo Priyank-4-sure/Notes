@@ -17,6 +17,11 @@ import dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+def env_list(name, default=None):
+    value = os.environ.get(name, default or '')
+    return [item.strip() for item in value.split(',') if item.strip()]
+
 # Load environment variables from the .env file in the backend directory
 dotenv.load_dotenv(BASE_DIR / '.env')
 
@@ -32,17 +37,17 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-kp969vob(iik^lb2xa^ck
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 # Production-ready: Replace wildcard ALLOWED_HOSTS with environment variable
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = env_list('ALLOWED_HOSTS', 'localhost,127.0.0.1')
 
 # CORS configuration - production-ready
 if DEBUG:
     CORS_ALLOW_ALL_ORIGINS = True
 else:
     CORS_ALLOW_ALL_ORIGINS = False
-    CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',')
+    CORS_ALLOWED_ORIGINS = env_list('CORS_ALLOWED_ORIGINS')
 
 # CSRF trusted origins for production
-CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',')
+CSRF_TRUSTED_ORIGINS = env_list('CSRF_TRUSTED_ORIGINS')
 
 # Application definition
 
