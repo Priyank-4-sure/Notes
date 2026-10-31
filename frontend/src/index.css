@@ -1,12 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 @layer base {
-  html, body {
-    /* Tailwind's utility for overscroll-behavior-y: none */
-    @apply overscroll-y-none; 
-    
-    /* Optional: Prevents the screen from shifting when scrollbars appear */
-    @apply antialiased; 
+  html {
+    color-scheme: light dark;
+  }
+  
+  body {
+    @apply antialiased overscroll-y-none min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100;
   }
 }

@@ -1,24 +1,51 @@
 # Environment variables
 .env
+.env.*
+!.env.example
 backend/.env
 frontend/.env
-.env.local
-.env.production
-.env.development
 
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
 backend/db.sqlite3
 backend/staticfiles/
+backend/media/
 backend/fastembed_cache/
 
+# Django
+*.log
+backend/local_settings.py
+
 # Node / Frontend
+node_modules/
+dist/
+dist-ssr/
 frontend/node_modules/
 frontend/dist/
 frontend/.cache/
+frontend/.vite/
+coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-# OS files
+# Editors and OS
+.vscode/
+.idea/
 .DS_Store
 Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

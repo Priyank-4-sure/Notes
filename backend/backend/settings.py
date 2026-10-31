@@ -29,14 +29,20 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-kp969vob(iik^lb2xa^ck
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # Temporarily set to True so we can see real errors on Render
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS= ['*']
-CORS_ALLOWED_ORIGINS = [
-    "https://inspiring-meerkat-559824.netlify.app",
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-] # Keep this for local testing
+# Production-ready: Replace wildcard ALLOWED_HOSTS with environment variable
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+
+# CORS configuration - production-ready
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+else:
+    CORS_ALLOW_ALL_ORIGINS = False
+    CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',')
+
+# CSRF trusted origins for production
+CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',')
 
 # Application definition
 
@@ -47,6 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.postgres',
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
@@ -97,14 +104,23 @@ if db_url:
     if db_url.startswith('postgres://'):
         db_url = db_url.replace('postgres://', 'postgresql://', 1)
     url = urlparse.urlparse(db_url)
+    
+    # Render PostgreSQL databases require SSL.
+    # Render automatically injects the RENDER=true environment variable.
+    options = {}
+    if os.environ.get('RENDER') == 'true':
+        options['sslmode'] = 'require'
+
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': url.path[1:],
-            'USER': url.username,
-            'PASSWORD': url.password,
+            'NAME': urlparse.unquote(url.path[1:]),
+            'USER': urlparse.unquote(url.username) if url.username else '',
+            'PASSWORD': urlparse.unquote(url.password) if url.password else '',
             'HOST': url.hostname,
             'PORT': str(url.port) if url.port else '5432',
+            'OPTIONS': options,
+            'CONN_MAX_AGE': 600,
         }
     }
 else:
@@ -116,6 +132,7 @@ else:
             'PASSWORD': os.environ.get('DB_PASSWORD', 'password123'),
             'HOST': os.environ.get('DB_HOST', 'db'), # 'db' refers to the docker service name
             'PORT': os.environ.get('DB_PORT', '5432'),
+            'CONN_MAX_AGE': 600,
         }
     }
 
@@ -123,6 +140,14 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    'DEFAULT_THROTTLE_CLASSES': (
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.AnonRateThrottle',
+    ),
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '100/hour',
+        'anon': '10/hour',
+    },
 }
 
 # Password validation
@@ -160,9 +185,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-
-# Absolute path where collectstatic will gather all static assets
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Media files (User uploads, photos)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 
@@ -174,4 +201,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'REFRESH_TOKEN_REUSE': True,
 }

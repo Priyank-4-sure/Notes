@@ -24,5 +24,15 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
-        fields = '__all__'
-        read_only_fields = ['user', 'created_at', 'updated_at']
+        fields = ['id', 'title', 'markdown', 'pinned', 'created_at', 'updated_at']
+        read_only_fields = ['created_at', 'updated_at']
+
+    def validate_title(self, value):
+        if len(value) > 100:
+            raise serializers.ValidationError("Title must be at most 100 characters.")
+        return value
+
+    def validate_markdown(self, value):
+        if len(value) > 10000:
+            raise serializers.ValidationError("Markdown must be at most 10,000 characters.")
+        return value
